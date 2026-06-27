@@ -2,6 +2,8 @@ import Link from "next/link";
 import {
   ArrowDownRight,
   ArrowUpRight,
+  BarChart3,
+  PieChart,
   Plus,
   Receipt,
   TrendingUp,
@@ -12,6 +14,7 @@ import { requireUser } from "@/lib/auth";
 import { accountService } from "@/server/accounts/account.service";
 import { transactionService } from "@/server/transactions/transaction.service";
 import { budgetService } from "@/server/budgets/budget.service";
+import { analyticsService } from "@/server/analytics/analytics.service";
 import { ACCOUNT_TYPE_BY_VALUE } from "@/config/accounts";
 import { formatMoney } from "@/lib/money";
 import { serializeTransaction } from "@/types/transaction";
@@ -19,20 +22,29 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AccountIcon } from "@/components/accounts/account-icon";
 import { TransactionItem } from "@/components/transactions/transaction-item";
+import { SpendingDonut } from "@/components/charts/spending-donut";
+import { IncomeExpenseChart } from "@/components/charts/income-expense-chart";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [summary, accounts, txns, budgetData] = await Promise.all([
+  const [summary, accounts, txns, budgetData, analytics] = await Promise.all([
     accountService.summary(user.id),
     accountService.list(user.id),
     transactionService.dashboard(user.id),
     budgetService.listWithProgress(user.id, new Date()),
+    analyticsService.dashboard(user.id),
   ]);
 
   const currency = summary.currency;
@@ -43,6 +55,10 @@ export default async function DashboardPage() {
   const topBudgets = [...budgetData.budgets]
     .sort((a, b) => b.ratio - a.ratio)
     .slice(0, 4);
+
+  const hasTrend = analytics.monthlyTrend.some(
+    (m) => m.income > 0 || m.expense > 0,
+  );
 
   return (
     <div className="space-y-6">
@@ -82,6 +98,53 @@ export default async function DashboardPage() {
           icon={ArrowDownRight}
           accentClassName="bg-destructive/10 text-destructive"
         />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Spending by category</CardTitle>
+            <CardDescription>This month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {analytics.spendingByCategory.length > 0 ? (
+              <SpendingDonut
+                data={analytics.spendingByCategory}
+                total={analytics.totalSpending}
+                currency={currency}
+              />
+            ) : (
+              <EmptyState
+                icon={PieChart}
+                title="No spending this month"
+                description="Add expense transactions to see where your money goes."
+                className="border-0 py-10"
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Income vs expenses</CardTitle>
+            <CardDescription>Last 6 months</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {hasTrend ? (
+              <IncomeExpenseChart
+                data={analytics.monthlyTrend}
+                currency={currency}
+              />
+            ) : (
+              <EmptyState
+                icon={BarChart3}
+                title="Not enough history yet"
+                description="Your income and spending trend builds as you add transactions."
+                className="border-0 py-10"
+              />
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
