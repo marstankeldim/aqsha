@@ -16,6 +16,8 @@ export const prisma =
       process.env.NODE_ENV === "development"
         ? ["warn", "error"]
         : ["error"],
+    // Give interactive transactions headroom over Neon's pooled connection.
+    transactionOptions: { maxWait: 10_000, timeout: 20_000 },
   });
 
 if (process.env.NODE_ENV !== "production") {

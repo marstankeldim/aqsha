@@ -15,7 +15,7 @@ export function Logo({
 }: LogoProps) {
   return (
     <Link href={href} className={cn("flex items-center gap-2", className)}>
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-chart-6 text-base font-bold text-primary-foreground shadow-sm">
+      <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-chart-2 text-base font-bold text-primary-foreground shadow-sm">
         ₸
       </span>
       {showWordmark && (

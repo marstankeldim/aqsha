@@ -1,16 +1,7 @@
-import { ArrowLeftRight } from "lucide-react";
-
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder";
+import { TransactionsClient } from "@/components/transactions/transactions-client";
 
 export const metadata = { title: "Transactions" };
 
 export default function TransactionsPage() {
-  return (
-    <FeaturePlaceholder
-      title="Transactions"
-      description="Income, expenses, and transfers — searchable, filterable, sortable."
-      icon={ArrowLeftRight}
-      step="Step 2"
-    />
-  );
+  return <TransactionsClient />;
 }

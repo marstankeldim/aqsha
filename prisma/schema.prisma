@@ -182,7 +182,7 @@ model Account {
   balance        Decimal     @default(0) @db.Decimal(19, 4)
   institution    String?
   mask           String? // last 4 digits
-  color          String      @default("#6366f1")
+  color          String      @default("#10b981")
   icon           String?
   creditLimit    Decimal?    @db.Decimal(19, 4) // for credit cards
   isArchived     Boolean     @default(false)
@@ -192,7 +192,8 @@ model Account {
 
   user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   currency              Currency               @relation(fields: [currencyCode], references: [code])
-  transactions          Transaction[]
+  transactions          Transaction[]          @relation("AccountTransactions")
+  transferTransactions  Transaction[]          @relation("AccountTransfers")
   holdings              Holding[]
   recurringTransactions RecurringTransaction[]
   fundedGoals           Goal[]
@@ -244,25 +245,28 @@ model Transaction {
   merchant             String?
   notes                String?
   status               TransactionStatus @default(CLEARED)
-  // Both legs of a transfer share this id.
-  transferGroupId      String?
+  // A transfer is a single row owned by the source account; these point at the
+  // destination account and the amount it received (in the dest currency).
+  transferAccountId    String?
+  transferAmount       Decimal?          @db.Decimal(19, 4)
   recurringId          String?
   isExcludedFromReports Boolean          @default(false)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 
-  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account     Account               @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  category    Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  currency    Currency              @relation(fields: [currencyCode], references: [code])
-  recurring   RecurringTransaction? @relation(fields: [recurringId], references: [id], onDelete: SetNull)
-  tags        TransactionTag[]
-  attachments Attachment[]
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account         Account               @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
+  transferAccount Account?              @relation("AccountTransfers", fields: [transferAccountId], references: [id], onDelete: SetNull)
+  category        Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  currency        Currency              @relation(fields: [currencyCode], references: [code])
+  recurring       RecurringTransaction? @relation(fields: [recurringId], references: [id], onDelete: SetNull)
+  tags            TransactionTag[]
+  attachments     Attachment[]
 
   @@index([userId, date])
   @@index([accountId, date])
   @@index([categoryId])
-  @@index([transferGroupId])
+  @@index([transferAccountId])
   @@index([recurringId])
 }
 
@@ -308,7 +312,8 @@ model Budget {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, categoryId, period, startDate])
+  // One budget per category (or overall) per period — matches the service guard.
+  @@unique([userId, categoryId, period])
   @@index([userId, startDate])
 }
 

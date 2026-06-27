@@ -7,90 +7,91 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 160 30% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 160 30% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 160 30% 9%;
 
-    --primary: 243 75% 59%;
+    /* Emerald brand */
+    --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 150 20% 96%;
+    --secondary-foreground: 160 30% 12%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 150 20% 96%;
+    --muted-foreground: 155 12% 42%;
 
-    --accent: 243 75% 96%;
-    --accent-foreground: 243 75% 40%;
+    --accent: 152 55% 94%;
+    --accent-foreground: 161 84% 26%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 40%;
+    --success: 145 70% 38%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 46%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 243 75% 59%;
+    --border: 150 18% 90%;
+    --input: 150 18% 90%;
+    --ring: 160 84% 39%;
 
-    --chart-1: 243 75% 59%;
-    --chart-2: 142 71% 45%;
-    --chart-3: 38 92% 50%;
+    --chart-1: 160 84% 39%;
+    --chart-2: 173 70% 38%;
+    --chart-3: 43 96% 50%;
     --chart-4: 199 89% 48%;
-    --chart-5: 340 82% 52%;
-    --chart-6: 263 70% 60%;
+    --chart-5: 280 60% 58%;
+    --chart-6: 340 75% 55%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
+    --background: 160 30% 6%;
+    --foreground: 150 20% 98%;
 
-    --card: 222 44% 10%;
-    --card-foreground: 210 40% 98%;
+    --card: 162 26% 9%;
+    --card-foreground: 150 20% 98%;
 
-    --popover: 222 44% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 162 26% 9%;
+    --popover-foreground: 150 20% 98%;
 
-    --primary: 243 75% 66%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 156 72% 48%;
+    --primary-foreground: 160 40% 8%;
 
-    --secondary: 217 33% 16%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 158 20% 15%;
+    --secondary-foreground: 150 20% 98%;
 
-    --muted: 217 33% 16%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 158 20% 15%;
+    --muted-foreground: 152 14% 64%;
 
-    --accent: 243 40% 22%;
-    --accent-foreground: 243 75% 85%;
+    --accent: 158 38% 18%;
+    --accent-foreground: 152 70% 78%;
 
     --destructive: 0 63% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 64% 45%;
-    --success-foreground: 0 0% 100%;
+    --success: 145 60% 46%;
+    --success-foreground: 160 40% 8%;
 
     --warning: 38 92% 52%;
-    --warning-foreground: 222 47% 11%;
+    --warning-foreground: 160 40% 8%;
 
-    --border: 217 33% 19%;
-    --input: 217 33% 19%;
-    --ring: 243 75% 66%;
+    --border: 158 20% 18%;
+    --input: 158 20% 18%;
+    --ring: 156 72% 48%;
 
-    --chart-1: 243 75% 66%;
-    --chart-2: 142 64% 50%;
-    --chart-3: 38 92% 55%;
-    --chart-4: 199 89% 55%;
-    --chart-5: 340 82% 62%;
-    --chart-6: 263 70% 68%;
+    --chart-1: 156 72% 50%;
+    --chart-2: 173 65% 48%;
+    --chart-3: 43 92% 58%;
+    --chart-4: 199 89% 58%;
+    --chart-5: 280 60% 68%;
+    --chart-6: 340 75% 64%;
   }
 }
 
@@ -118,7 +119,7 @@
     background-size: 28px 28px;
   }
   .text-gradient {
-    @apply bg-gradient-to-br from-primary to-chart-6 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-primary to-chart-2 bg-clip-text text-transparent;
   }
   /* Loading skeleton shimmer. */
   .shimmer {
