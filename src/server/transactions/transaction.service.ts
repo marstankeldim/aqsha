@@ -117,7 +117,11 @@ export const transactionService = {
     return t;
   },
 
-  async create(userId: string, input: CreateTransactionInput) {
+  async create(
+    userId: string,
+    input: CreateTransactionInput,
+    recurringId: string | null = null,
+  ) {
     const { account, amount, transferAccount, transferAmount } =
       await resolveTargets(userId, input);
 
@@ -135,6 +139,7 @@ export const transactionService = {
           categoryId: input.type === "TRANSFER" ? null : input.categoryId || null,
           transferAccountId: transferAccount?.id ?? null,
           transferAmount,
+          recurringId,
         },
       });
 

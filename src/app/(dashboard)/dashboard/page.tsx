@@ -15,15 +15,18 @@ import { accountService } from "@/server/accounts/account.service";
 import { transactionService } from "@/server/transactions/transaction.service";
 import { budgetService } from "@/server/budgets/budget.service";
 import { analyticsService } from "@/server/analytics/analytics.service";
+import { goalService } from "@/server/goals/goal.service";
 import { ACCOUNT_TYPE_BY_VALUE } from "@/config/accounts";
 import { formatMoney } from "@/lib/money";
 import { serializeTransaction } from "@/types/transaction";
+import { serializeGoal } from "@/types/goal";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AccountIcon } from "@/components/accounts/account-icon";
 import { TransactionItem } from "@/components/transactions/transaction-item";
 import { SpendingDonut } from "@/components/charts/spending-donut";
 import { IncomeExpenseChart } from "@/components/charts/income-expense-chart";
+import { GoalProgressRing } from "@/components/goals/goal-progress-ring";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,13 +42,15 @@ export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [summary, accounts, txns, budgetData, analytics] = await Promise.all([
-    accountService.summary(user.id),
-    accountService.list(user.id),
-    transactionService.dashboard(user.id),
-    budgetService.listWithProgress(user.id, new Date()),
-    analyticsService.dashboard(user.id),
-  ]);
+  const [summary, accounts, txns, budgetData, analytics, goalsRaw] =
+    await Promise.all([
+      accountService.summary(user.id),
+      accountService.list(user.id),
+      transactionService.dashboard(user.id),
+      budgetService.listWithProgress(user.id, new Date()),
+      analyticsService.dashboard(user.id),
+      goalService.list(user.id),
+    ]);
 
   const currency = summary.currency;
   const firstName = user.firstName ?? "there";
@@ -54,6 +59,11 @@ export default async function DashboardPage() {
   // Surface the most at-risk budgets first.
   const topBudgets = [...budgetData.budgets]
     .sort((a, b) => b.ratio - a.ratio)
+    .slice(0, 4);
+
+  const topGoals = goalsRaw
+    .map(serializeGoal)
+    .filter((g) => g.status !== "ARCHIVED")
     .slice(0, 4);
 
   const hasTrend = analytics.monthlyTrend.some(
@@ -275,6 +285,52 @@ export default async function DashboardPage() {
                 </div>
               );
             })}
+          </CardContent>
+        </Card>
+      )}
+
+      {topGoals.length > 0 && (
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardTitle>Goals</CardTitle>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/goals">View all</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {topGoals.map((g) => {
+                const pct = Math.round(g.ratio * 100);
+                return (
+                  <div key={g.id} className="flex items-center gap-3">
+                    <GoalProgressRing
+                      value={pct}
+                      size={56}
+                      strokeWidth={6}
+                      color={g.color}
+                    >
+                      <span className="text-xs font-semibold tabular-nums">
+                        {pct}%
+                      </span>
+                    </GoalProgressRing>
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">
+                        {g.name}
+                      </div>
+                      <div className="text-xs tabular-nums text-muted-foreground">
+                        {formatMoney(g.currentAmount, g.currencyCode, {
+                          compact: true,
+                        })}{" "}
+                        /{" "}
+                        {formatMoney(g.targetAmount, g.currencyCode, {
+                          compact: true,
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       )}

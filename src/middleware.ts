@@ -10,6 +10,8 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/health",
+  // Cron endpoints authenticate via CRON_SECRET, not a Clerk session.
+  "/api/cron(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
