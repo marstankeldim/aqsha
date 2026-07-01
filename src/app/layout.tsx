@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { shadcn } from "@clerk/ui/themes";
 
 import { Providers } from "@/components/providers";
 import { SITE } from "@/config/site";
@@ -38,7 +37,9 @@ export default function RootLayout({
         className={`${inter.variable} ${mono.variable} font-sans`}
         suppressHydrationWarning
       >
-        <ClerkProvider appearance={{ theme: shadcn }}>
+        <ClerkProvider
+          appearance={{ variables: { colorPrimary: "#10b981" } }}
+        >
           <Providers>{children}</Providers>
         </ClerkProvider>
       </body>

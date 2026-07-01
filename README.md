@@ -180,6 +180,21 @@ Three ways they post:
 
 ---
 
+## Security
+
+Aqsha is built defensively — it handles real financial data, so security is a first-class concern:
+
+- **Authentication & tenant isolation** — every page and API route is gated by Clerk; every database query is scoped by `userId`, so one user can never read or mutate another's data (IDOR-safe). Service-layer ownership checks precede every update/delete.
+- **Input validation** — all mutations and query params are validated with **Zod** on the server before touching the database; `data` objects are built field-by-field (no mass assignment).
+- **SQL-injection-safe** — 100% of data access goes through Prisma's parameterized query API (no string-built SQL).
+- **Money integrity** — decimal (never float) money, with balance-changing operations wrapped in database transactions.
+- **Secrets** — `.env` is gitignored and never committed; no secret is exposed to the client (only `NEXT_PUBLIC_*` and the Clerk publishable key are public).
+- **HTTP hardening** — security headers on every response: `Strict-Transport-Security`, `X-Frame-Options: DENY` (anti-clickjacking), `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`, and the framework banner disabled.
+- **Cron** — the recurring-transactions cron authenticates with a `CRON_SECRET` compared in **constant time** (`timingSafeEqual`).
+- **Dependency hygiene** — audited with `npm audit`; removed a heavy transitive dependency that pulled an entire crypto-wallet stack into the app, eliminating the majority of advisories. Remaining advisories are internal to Next.js with no exploit path in this app.
+
+**Recommended before a public production launch:** add rate limiting on auth/mutation endpoints (e.g. Upstash Ratelimit) and a nonce-based Content-Security-Policy.
+
 ## Roadmap
 
 - [x] Foundation, auth, app shell
